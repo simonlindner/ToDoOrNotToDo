@@ -78,7 +78,6 @@ public class WeatherService {
 
     public String getCityForCoordinates(double lat, double lon) {
         try {
-            @SuppressWarnings("unchecked")
             var response = restClient.get()
                     .uri("https://nominatim.openstreetmap.org/reverse?lat={lat}&lon={lon}&format=json", lat, lon)
                     .header("User-Agent", "ToDoOrNotToDo-App")
