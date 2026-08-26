@@ -32,9 +32,9 @@ public class Activity {
     @Column(name = "max_temp")
     private Integer maxTemp;
 
-    @Column(name = "requires_sunlight")
-    private Boolean requiresSunlight;
+    @Column(nullable = false, name = "requires_sunlight")
+    private boolean requiresSunlight;
 
-    @Column(name = "is_indoor")
-    private Boolean isIndoor;
+    @Column(nullable = false, name = "is_indoor")
+    private boolean isIndoor;
 }

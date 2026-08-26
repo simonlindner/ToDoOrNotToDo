@@ -73,6 +73,31 @@ public class WeatherService {
             System.err.println("Fehler bei der Geokodierung: " + e.getMessage());
         }
         // Fallback: Köln
-        return new double[]{50.9375, 6.9603};
+        return null;
+    }
+
+    public String getCityForCoordinates(double lat, double lon) {
+        try {
+            @SuppressWarnings("unchecked")
+            var response = restClient.get()
+                    .uri("https://nominatim.openstreetmap.org/reverse?lat={lat}&lon={lon}&format=json", lat, lon)
+                    .header("User-Agent", "ToDoOrNotToDo-App")
+                    .retrieve()
+                    .body(Map.class);
+
+            if (response != null && response.containsKey("address")) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> address = (Map<String, Object>) response.get("address");
+                
+                if (address.containsKey("city")) return (String) address.get("city");
+                if (address.containsKey("town")) return (String) address.get("town");
+                if (address.containsKey("village")) return (String) address.get("village");
+                if (address.containsKey("municipality")) return (String) address.get("municipality");
+                if (address.containsKey("county")) return (String) address.get("county");
+            }
+        } catch (Exception e) {
+            System.err.println("Fehler bei Reverse-Geokodierung: " + e.getMessage());
+        }
+        return null;
     }
 }
