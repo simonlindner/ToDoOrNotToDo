@@ -2,7 +2,6 @@ package SimonLindner.ToDoOrNotToDo.controller;
 
 import SimonLindner.ToDoOrNotToDo.dto.ActivityMatchDto;
 import SimonLindner.ToDoOrNotToDo.dto.DailyWeatherDto;
-import SimonLindner.ToDoOrNotToDo.dto.DayMatchDto;
 import SimonLindner.ToDoOrNotToDo.model.Activity;
 import SimonLindner.ToDoOrNotToDo.service.ActivityService;
 import SimonLindner.ToDoOrNotToDo.service.WeatherService;
