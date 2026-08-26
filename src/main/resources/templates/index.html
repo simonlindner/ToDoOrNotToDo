@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>ToDoOrNotToDo - Dashboard</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <!-- Leaflet CSS für die Karte -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        #map { height: 250px; border-radius: 8px; margin-bottom: 15px; }
+    </style>
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">ToDoOrNotToDo</a>
+        <div>
+            <a href="/" class="btn btn-outline-light me-2">Wetter & Matches</a>
+            <a href="/activities" class="btn btn-light">Aktivitäten verwalten</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card p-3 shadow-sm">
+                <h5 class="card-title">Standort wählen</h5>
+                
+                <!-- Formular 1: Suche nach Stadt -->
+                <form action="/" method="get" class="mb-3">
+                    <div class="input-group">
+                        <input type="text" name="city" class="form-control" placeholder="Stadt eingeben (z.B. Berlin, Köln)">
+                        <button class="btn btn-primary" type="submit">Suchen</button>
+                    </div>
+                </form>
+
+                <hr>
+
+                <!-- Formular 2: Direkt nach Koordinaten oder Map Click -->
+                <form action="/" method="get">
+                    <div class="row g-2 mb-2">
+                        <div class="col">
+                            <input type="number" step="any" id="latInput" name="lat" class="form-control" 
+                                   th:value="${selectedLat}" placeholder="Breitengrad" required>
+                        </div>
+                        <div class="col">
+                            <input type="number" step="any" id="lonInput" name="lon" class="form-control" 
+                                   th:value="${selectedLon}" placeholder="Längengrad" required>
+                        </div>
+                    </div>
+                    <button class="btn btn-outline-secondary w-100" type="submit">Koordinaten anwenden</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card p-3 shadow-sm">
+                <h5 class="card-title">Klicke auf die Karte (Map Picker)</h5>
+                <div id="map"></div>
+                <small class="text-muted">Klicke auf einen Ort, um Lat/Lon automatisch in das Formular zu übernehmen.</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wetter & Aktivitätsvorhersage für 7 Tage -->
+    <h3 class="mb-3">7-Tage-Vorhersage für: <span class="text-primary" th:text="${locationName}">Ort</span></h3>
+    
+    <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-3 mb-5">
+        <div class="col" th:each="dayMatch : ${matches}">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-header bg-secondary text-white text-center">
+                    <strong th:text="${#temporals.format(dayMatch.date, 'EEEE, dd.MM.')}">Datum</strong>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-2">
+                        <span class="fs-4 fw-bold" th:text="${dayMatch.weather.maxTemp + ' °C'}">22 °C</span>
+                        <br>
+                        <small class="text-muted" th:text="${'Min: ' + dayMatch.weather.minTemp + ' °C | Regen: ' + dayMatch.weather.rainProbability + '%'}">Details</small>
+                    </div>
+
+                    <hr>
+                    <h6>Passende Aktivitäten:</h6>
+                    <ul class="list-group list-group-flush small" th:if="${!dayMatch.matchingActivities.isEmpty()}">
+                        <li class="list-group-item px-0" th:each="act : ${dayMatch.matchingActivities}">
+                            <span th:text="${act.name}">Aktivität</span>
+                            <span th:if="${act.isIndoor}" class="badge bg-info text-dark float-end">Indoor</span>
+                            <span th:if="${!act.isIndoor}" class="badge bg-success float-end">Outdoor</span>
+                        </li>
+                    </ul>
+                    <div th:if="${dayMatch.matchingActivities.isEmpty()}" class="text-danger small">
+                        Keine passenden Aktivitäten für dieses Wetter.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Leaflet JS für Interaktive Karte -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script th:inline="javascript">
+    var lat = /*[[${selectedLat}]]*/ 0;
+    var lon = /*[[${selectedLon}]]*/ 0;
+
+    var map = L.map('map').setView([lat, lon], 10);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    var marker = L.marker([lat, lon]).addTo(map);
+
+    map.on('click', function(e) {
+        var clickedLat = e.latlng.lat.toFixed(4);
+        var clickedLon = e.latlng.lng.toFixed(4);
+
+        marker.setLatLng(e.latlng);
+        document.getElementById('latInput').value = clickedLat;
+        document.getElementById('lonInput').value = clickedLon;
+    });
+</script>
+</body>
+</html>

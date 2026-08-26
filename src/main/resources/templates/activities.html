@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Aktivitäten verwalten</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body class="bg-light">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+    <div class="container">
+        <a class="navbar-brand fw-bold" href="/">ToDoOrNotToDo</a>
+        <div>
+            <a href="/" class="btn btn-outline-light me-2">Wetter & Matches</a>
+            <a href="/activities" class="btn btn-light">Aktivitäten verwalten</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <div class="row">
+        <!-- Formular: Neue Aktivität anlegen -->
+        <div class="col-md-4 mb-4">
+            <div class="card p-3 shadow-sm">
+                <h5 class="card-title">Neue Aktivität</h5>
+                <form action="/activities" method="post" th:object="${newActivity}">
+                    <div class="mb-3">
+                        <label class="form-label">Name der Aktivität</label>
+                        <input type="text" th:field="*{name}" class="form-control" placeholder="z. B. Grillen im Park" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Min Temp (°C)</label>
+                        <input type="number" th:field="*{minTemp}" class="form-control" placeholder="z. B. 20">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Max Temp (°C)</label>
+                        <input type="number" th:field="*{maxTemp}" class="form-control" placeholder="z. B. 35">
+                    </div>
+                    <div class="form-check mb-2">
+                        <input type="checkbox" th:field="*{requiresSunlight}" class="form-check-input" id="sunCheck">
+                        <label class="form-check-label" for="sunCheck">Braucht Sonne/Trockenheit</label>
+                    </div>
+                    <div class="form-check mb-3">
+                        <input type="checkbox" th:field="*{isIndoor}" class="form-check-input" id="indoorCheck">
+                        <label class="form-check-label" for="indoorCheck">Ist Indoor-Aktivität</label>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100">Aktivität Speichern</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tabelle: Alle Aktivitäten anzeigen -->
+        <div class="col-md-8">
+            <div class="card p-3 shadow-sm">
+                <h5 class="card-title">Gespeicherte Aktivitäten</h5>
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Min Temp</th>
+                            <th>Max Temp</th>
+                            <th>Typ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="act : ${activities}">
+                            <td class="fw-bold" th:text="${act.name}">Name</td>
+                            <td th:text="${act.minTemp != null ? act.minTemp + ' °C' : '-'}">-</td>
+                            <td th:text="${act.maxTemp != null ? act.maxTemp + ' °C' : '-'}">-</td>
+                            <td>
+                                <span th:if="${act.isIndoor}" class="badge bg-info text-dark">Indoor</span>
+                                <span th:if="${!act.isIndoor}" class="badge bg-success">Outdoor</span>
+                                <span th:if="${act.requiresSunlight}" class="badge bg-warning text-dark">Sonne nötig</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
